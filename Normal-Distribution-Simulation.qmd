@@ -19,17 +19,17 @@ Accurate data collection and preparation are paramount for drawing meaningful co
 
 The prompt provides the following scenario: the data collection instrument has a limitation wherein it can only store up to 900 observations in memory, after which it begins overwriting data, resulting in the final 100 observations being duplicates of the first 100. Moreover, a research assistant is employed to clean and prepare the dataset. While cleaning the data, the assistant accidentally changed half of the negative draws to be positive. Additionally, errors introduced during data cleaning include the accidental conversion of half of the negative values to positive and a shift in the decimal place for values between 1and 1.1.
 
-The analysis primarily utilized the R language and environment [@citeR], leveraging its robust statistical capabilities and extensive library ecosystem. Specifically, the ggplot2 package [@ggplot2] was employed for visualizing observations and trends following each stage of data manipulation.
+The analysis primarily utilized the R language and environment [@citeR], leveraging its robust statistical capabilities and extensive library ecosystem. Specifically, the ggplot2 package [@citeggplot2] was employed for visualizing observations and trends following each stage of data manipulation.
 
 # Set-up
 
-To initiate the simulation, we generated a dataset comprising 1,000 observations drawn from a Normal distribution with a mean of one and a standard deviation of one. This synthetic dataset serves as a representation of the true data generating process outlined in the prompt. From @tbl-true_data, we observe the summary statistics of the true dataset, with a minimum of -1.81, maximum of 4.24, median of 1.01, and mean of 1.02. And we simulate all the scenarios from the prompt using the dataset.
+To initiate the simulation, we generated a dataset comprising 1,000 observations drawn from a Normal distribution with a mean of one and a standard deviation of one. This synthetic dataset serves as a representation of the true data generating process outlined in the prompt. From @tbl-table1, we observe the summary statistics of the true dataset, with a minimum of -1.81, maximum of 4.24, median of 1.01, and mean of 1.02. And we simulate all the scenarios from the prompt using the dataset.
 
 ```{r}
 #| echo: false
 #| eval: true
-#| label: tbl-true_data
-#| tbl-cap: Summary Statistics of True Data
+#| label: tbl-table1
+#| tbl-cap: Summary Statistics of Data
 #| warning: false
 
 library(ggplot2)
@@ -39,25 +39,8 @@ set.seed(123)
 # Simulate the true data generating process
 true_data <- rnorm(1000, mean = 1, sd = 1)
 # Summary statistics
-summary_stats <- summary(true_data)
-
-# Extract summary statistics
-min_value <- round(summary_stats[1], 2)
-q1 <- round(summary_stats[2], 2)
-median_value <- round(summary_stats[3], 2)
-mean_value <- round(summary_stats[4], 2)
-q3 <- round(summary_stats[5], 2)
-max_value <- round(summary_stats[6], 2)
-
-
-# Create data frame
-summary_df <- data.frame(
-  Statistics = c("Minimum", "1st Quartile", "Median", "Mean", "3rd Quartile", "Maximum"),
-  Value = c(min_value, q1, median_value, mean_value, q3, max_value)
-)
-
-# Print table
-summary_df
+summary_stats <- round(summary(true_data), 2)
+print(summary_stats)
 ```
 
 ## Situation 1
@@ -72,6 +55,7 @@ We observe the overall distribution of the dataset from @fig-1. Despite the dist
 #| warning: false
 #| label: fig-1
 #| fig-cap: Situation 1 Distribution
+
 library(ggplot2)
 # Introduce error in the instrument memory
 error_data <- true_data
@@ -110,7 +94,6 @@ ggplot(data = data.frame(value = error_data), aes(x = value)) +
   labs(title = "Situation 2 Distribution",
        x = "Value",
        y = "Frequency")
-summary(error_data)
 
 ```
 
@@ -134,7 +117,6 @@ ggplot(data = data.frame(value = error_data), aes(x = value)) +
   labs(title = "Situation 3 Distribution",
        x = "Value",
        y = "Frequency")
-summary(error_data)
 
 ```
 
@@ -151,7 +133,7 @@ The restoration of the dataset to its original form underscores the importance o
 #| eval: true
 #| warning: false
 #| label: fig-4
-#| fig-cap: Situation 4: Cleaned Dataset Distribution
+#| fig-cap: Situation 4-Cleaned Dataset Distribution
 # Cleaned dataset obtained after the inadvertent modifications
 cleaned_data <- true_data
 
@@ -179,3 +161,5 @@ In Situation 3, where the decimal places of values between 1 and 1.1 were altere
 To ensure that similar issues are flagged during actual analyses, several steps can be implemented. Firstly, conducting thorough data validation checks before and after data cleaning processes can help identify inconsistencies or anomalies [@cite2]. Additionally, implementing automated data quality checks and validation scripts can assist in detecting errors early in the analysis pipeline. Furthermore, establishing clear documentation and communication channels among team members involved in data collection and analysis can facilitate the identification and resolution of potential issues.
 
 In conclusion, the errors introduced during data collection and cleaning processes can have profound effects on the integrity of the dataset and subsequent analyses. By implementing robust quality control measures and validation checks, researchers can mitigate the risk of errors and ensure the reliability of their findings.
+
+# References

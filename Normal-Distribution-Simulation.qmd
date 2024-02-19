@@ -1,9 +1,8 @@
 ---
-title: "Normal Distribution Simulation"
+title: "Understanding Normal Distribution with Simulation"
 author: 
   - Hannah Yu
-
-thanks: "Code and data are available at: "https://github.com/hannahyu07/Normal-Distribution-Simulation"
+thanks: "Code and data are available at: https://github.com/hannahyu07/Normal-Distribution-Simulation"
 date: today
 date-format: long
 format: pdf
@@ -14,31 +13,89 @@ number-sections: true
 bibliography: references.bib
 ---
 
+# Introduction
+
+Accurate data collection and preparation are paramount for drawing meaningful conclusions from statistical analysis. However, various anomalies such as measurement errors, instrument limitations, and human mistakes can introduce biases and distortions into the data, potentially leading to erroneous interpretations. In this study, we simulate a scenario to examine the repercussions of multiple errors occurring during data collection and cleaning, with the objective of elucidating their impact on statistical inference.
+
+The prompt provides the following scenario: the data collection instrument has a limitation wherein it can only store up to 900 observations in memory, after which it begins overwriting data, resulting in the final 100 observations being duplicates of the first 100. Moreover, a research assistant is employed to clean and prepare the dataset. While cleaning the data, the assistant accidentally changed half of the negative draws to be positive. Additionally, errors introduced during data cleaning include the accidental conversion of half of the negative values to positive and a shift in the decimal place for values between 1and 1.1.
+
+The analysis primarily utilized the R language and environment [@citeR], leveraging its robust statistical capabilities and extensive library ecosystem. Specifically, the ggplot2 package [@ggplot2] was employed for visualizing observations and trends following each stage of data manipulation.
+
+# Set-up
+
+To initiate the simulation, we generated a dataset comprising 1,000 observations drawn from a Normal distribution with a mean of one and a standard deviation of one. This synthetic dataset serves as a representation of the true data generating process outlined in the prompt. From @tbl-true_data, we observe the summary statistics of the true dataset, with a minimum of -1.81, maximum of 4.24, median of 1.01, and mean of 1.02. And we simulate all the scenarios from the prompt using the dataset.
+
 ```{r}
 #| echo: false
 #| eval: true
+#| label: tbl-true_data
+#| tbl-cap: Summary Statistics of True Data
 #| warning: false
 
+library(ggplot2)
 # Set seed for reproducibility
 set.seed(123)
 
 # Simulate the true data generating process
 true_data <- rnorm(1000, mean = 1, sd = 1)
-# Plotting the original true data generating process
-hist(true_data, breaks = 30, main = "True Data Generating Process", xlab = "Value", ylab = "Frequency")
+# Summary statistics
+summary_stats <- summary(true_data)
+
+# Extract summary statistics
+min_value <- round(summary_stats[1], 2)
+q1 <- round(summary_stats[2], 2)
+median_value <- round(summary_stats[3], 2)
+mean_value <- round(summary_stats[4], 2)
+q3 <- round(summary_stats[5], 2)
+max_value <- round(summary_stats[6], 2)
 
 
+# Create data frame
+summary_df <- data.frame(
+  Statistics = c("Minimum", "1st Quartile", "Median", "Mean", "3rd Quartile", "Maximum"),
+  Value = c(min_value, q1, median_value, mean_value, q3, max_value)
+)
+
+# Print table
+summary_df
 ```
 
+## Situation 1
+
+In this section, we examine the consequences of a memory limitation in the data collection instrument, which results in the duplication of observations towards the end of the dataset. Specifically, the dataset has a maximum memory of 900 observations, and overwrites the final 100 observatiosn as a repeat of the first 100.
+
+We observe the overall distribution of the dataset from @fig-1. Despite the distortion introduced by the duplication of observations, the overall shape of the distribution remains consistent with a normal distribution. While certain values may be more prevalent than others due to the duplication, the fundamental characteristics of the distribution remain unchanged.
+
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| label: fig-1
+#| fig-cap: Situation 1 Distribution
+library(ggplot2)
 # Introduce error in the instrument memory
 error_data <- true_data
 error_data[901:1000] <- true_data[1:100]
-# Plotting the original true data generating process
-hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+ggplot(data = data.frame(value = error_data), aes(x = value)) +
+  geom_histogram(binwidth = 0.2, color = "black", fill = "skyblue", alpha = 0.7) +
+  labs(title = "Situation 1 Distribution",
+       x = "Value",
+       y = "Frequency")
+
 ```
 
+## Situation 2
+
+In this segment, we address another common data cleaning error: the inadvertent conversion of negative values to positive ones. First, we identify the indices of negative values in the dataset. Subsequently, we randomly select half of these negative values and convert them to their positive counterparts.
+
+The resulting distribution, visualized through histogram @fig-2 reflects the effects of this error on the dataset. While the overall shape of the distribution still resemble normal distribution, certain values may be inflated due to the conversion of negative values to positive. Notably, there's a slight increase in frequency for all values above 0, while the frequency of negative numbers is halved.
+
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| label: fig-2
+#| fig-cap: Situation 2 Distribution
 # Identify negative values in the dataset
 neg_indices <- which(error_data < 0)
 
@@ -48,29 +105,77 @@ neg_to_pos_indices <- sample(neg_indices, length(neg_indices) / 2)
 # Change selected negative values to positive
 error_data[neg_to_pos_indices] <- abs(error_data[neg_to_pos_indices])
 
-# Plotting the original true data generating process
-hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+ggplot(data = data.frame(value = error_data), aes(x = value)) +
+  geom_histogram(binwidth = 0.2, color = "black", fill = "skyblue", alpha = 0.7) +
+  labs(title = "Situation 2 Distribution",
+       x = "Value",
+       y = "Frequency")
+summary(error_data)
+
 ```
 
+## Situation 3
+
+\
+In this section, we simulate yet another data cleaning error: the inadvertent alteration of decimal places in values falling between 1 and 1.1. We identify these values within the dataset and divide them by 10, effectively shifting their decimal place by one position to the left. This manipulation mimics a scenario where data cleaning procedures introduce unintended changes to the dataset.
+
+The resulting distribution, visualized through histogram @fig-3, demonstrates the effects of this error on the dataset. While the overall shape of the distribution may still exhibit characteristics of a normal distribution, the alteration of decimal places can lead to discrepancies in the frequency distribution. Notably, values between 1 and 1.1 exhibit a decrease in frequency, while values between 0 and 0.11 experience a corresponding increase in frequency.
+
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| label: fig-3
+#| fig-cap: Situation 3 Distribution
 # Introduce error by changing the decimal place on values between 1 and 1.1
-error_data[which(error_data > 1 & error_data <= 1.1)] <- error_data[which(error_data >= 1 & error_data <= 1.1)] / 10
-# Plotting the original true data generating process
-hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+error_data[which(error_data >= 1 & error_data <= 1.1)] <- error_data[which(error_data >= 1 & error_data <= 1.1)] / 10
+ggplot(data = data.frame(value = error_data), aes(x = value)) +
+  geom_histogram(binwidth = 0.2, color = "black", fill = "skyblue", alpha = 0.7) +
+  labs(title = "Situation 3 Distribution",
+       x = "Value",
+       y = "Frequency")
+summary(error_data)
+
 ```
 
+## Situation 4
+
+In the previous section, we addressed various data cleaning errors and their effects on the dataset. To conclude, we restored the dataset by reverting to the original true data and visualized the corrected cleaned dataset in histogram @fig-4.
+
+Upon examination, we observe a distribution consistent with a normal distribution. This distribution comprises 1000 observations, centered around a mean of 1 and with a standard deviation of 1, aligning precisely with the parameters specified in the original true data generating process.
+
+The restoration of the dataset to its original form underscores the importance of thorough validation and scrutiny during the data cleaning process.
+
 ```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| label: fig-4
+#| fig-cap: Situation 4: Cleaned Dataset Distribution
 # Cleaned dataset obtained after the inadvertent modifications
 cleaned_data <- true_data
 
-# Check whether the mean of the cleaned dataset is greater than 0
-mean_cleaned <- mean(cleaned_data)
-mean_cleaned_greater_than_zero <- mean_cleaned > 0
 
-# Output the result
-cat("Mean of the cleaned dataset:", mean_cleaned, "\n")
-cat("Is the mean greater than 0?", mean_cleaned_greater_than_zero, "\n")
 # Plotting the original true data generating process
-hist(true_data, breaks = 30, main = "True Data Generating Process", xlab = "Value", ylab = "Frequency")
+ggplot(data = data.frame(value = true_data), aes(x = value)) +
+  geom_histogram(binwidth = 0.2, color = "black", fill = "skyblue", alpha = 0.7) +
+  labs(title = "Cleaned Dataset Distribution",
+       x = "Value",
+       y = "Frequency")
 
 ```
+
+# Discussion
+
+\
+The errors introduced during the data collection and cleaning processes have significant implications for the integrity of the dataset and subsequent analyses. Each error resulted in distortions to the distribution of the dataset, potentially biasing statistical inferences and leading to erroneous conclusions. Just like @cite1 emphasized the importance to address errors in data cleaning to prevent false study conclusions.
+
+In Situation 1, where the data collection instrument had a memory limitation causing the duplication of observations, we observed a distortion in the dataset's distribution. While the overall shape remained similar to a normal distribution, certain values were overrepresented due to the duplication. This highlights the importance of validating data collection instruments and implementing measures to prevent memory limitations from compromising data integrity.
+
+Similarly, in Situation 2, the inadvertent conversion of negative values to positive ones introduced biases into the dataset. Although the overall shape still resembled a normal distribution, the frequency of values above 0 increased while the frequency of negative values decreased. To prevent such errors, robust data cleaning protocols should be established, including thorough checks for unintended alterations to the dataset.
+
+In Situation 3, where the decimal places of values between 1 and 1.1 were altered, we observed further distortions in the dataset's distribution. While the overall shape remained similar to a normal distribution, the alteration of decimal places led to discrepancies in the frequency distribution. Values between 1 and 1.1 experienced a decrease in frequency, while values between 0 and 0.11 saw a corresponding increase. Implementing stringent quality control measures during data cleaning can help mitigate such errors.
+
+To ensure that similar issues are flagged during actual analyses, several steps can be implemented. Firstly, conducting thorough data validation checks before and after data cleaning processes can help identify inconsistencies or anomalies [@cite2]. Additionally, implementing automated data quality checks and validation scripts can assist in detecting errors early in the analysis pipeline. Furthermore, establishing clear documentation and communication channels among team members involved in data collection and analysis can facilitate the identification and resolution of potential issues.
+
+In conclusion, the errors introduced during data collection and cleaning processes can have profound effects on the integrity of the dataset and subsequent analyses. By implementing robust quality control measures and validation checks, researchers can mitigate the risk of errors and ensure the reliability of their findings.

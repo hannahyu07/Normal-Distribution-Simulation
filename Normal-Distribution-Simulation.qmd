@@ -1,0 +1,76 @@
+---
+title: "Normal Distribution Simulation"
+author: 
+  - Hannah Yu
+
+thanks: "Code and data are available at: "https://github.com/hannahyu07/Normal-Distribution-Simulation"
+date: today
+date-format: long
+format: pdf
+output:
+  quarto::pdf_document:
+    latex_engine: xelatex
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Simulate the true data generating process
+true_data <- rnorm(1000, mean = 1, sd = 1)
+# Plotting the original true data generating process
+hist(true_data, breaks = 30, main = "True Data Generating Process", xlab = "Value", ylab = "Frequency")
+
+
+```
+
+```{r}
+# Introduce error in the instrument memory
+error_data <- true_data
+error_data[901:1000] <- true_data[1:100]
+# Plotting the original true data generating process
+hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+```
+
+```{r}
+# Identify negative values in the dataset
+neg_indices <- which(error_data < 0)
+
+# Randomly select half of the negative values to change to positive
+neg_to_pos_indices <- sample(neg_indices, length(neg_indices) / 2)
+
+# Change selected negative values to positive
+error_data[neg_to_pos_indices] <- abs(error_data[neg_to_pos_indices])
+
+# Plotting the original true data generating process
+hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+```
+
+```{r}
+# Introduce error by changing the decimal place on values between 1 and 1.1
+error_data[which(error_data > 1 & error_data <= 1.1)] <- error_data[which(error_data >= 1 & error_data <= 1.1)] / 10
+# Plotting the original true data generating process
+hist(error_data, breaks = 30, main = "Error Data Generating Process", xlab = "Value", ylab = "Frequency")
+```
+
+```{r}
+# Cleaned dataset obtained after the inadvertent modifications
+cleaned_data <- true_data
+
+# Check whether the mean of the cleaned dataset is greater than 0
+mean_cleaned <- mean(cleaned_data)
+mean_cleaned_greater_than_zero <- mean_cleaned > 0
+
+# Output the result
+cat("Mean of the cleaned dataset:", mean_cleaned, "\n")
+cat("Is the mean greater than 0?", mean_cleaned_greater_than_zero, "\n")
+# Plotting the original true data generating process
+hist(true_data, breaks = 30, main = "True Data Generating Process", xlab = "Value", ylab = "Frequency")
+
+```

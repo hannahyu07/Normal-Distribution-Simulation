@@ -1,6 +1,7 @@
 LLM: ChatGPT-4.
 Date: 19 February 2024
-
+Full Conversation: https://chat.openai.com/share/5adee9e5-6c4b-434d-9eb5-be8437e3994c
+ 
 Allow that the true data generating process is a Normal distribution with mean of one, and standard deviation of 1. We obtain a sample of 1,000 observations using some instrument. Simulate the following situation:
 
 Unknown to us, the instrument has a mistake in it, which means that it has a maximum memory of 900 observations, and begins over-writing at that point, so the final 100 observations are actually a repeat of the first 100.

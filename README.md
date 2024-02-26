@@ -1,4 +1,4 @@
-# Normal-Distribution-Simulation
+# Understanding Normal Distribution with Simulation
 
 ## Overview of Paper
 The paper explores the impact of various data collection and cleaning errors on dataset integrity and subsequent analyses, highlighting the necessity of robust quality control measures to mitigate risks and ensure reliable research findings.

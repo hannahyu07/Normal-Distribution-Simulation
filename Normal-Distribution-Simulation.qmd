@@ -15,11 +15,11 @@ bibliography: references.bib
 
 # Introduction
 
-Accurate data collection and preparation are paramount for drawing meaningful conclusions from statistical analysis. However, various anomalies such as measurement errors, instrument limitations, and human mistakes can introduce biases and distortions into the data, potentially leading to erroneous interpretations. In this study, we simulate a scenario to examine the repercussions of multiple errors occurring during data collection and cleaning, with the objective of elucidating their impact on statistical inference.
+Accurate data collection and preparation are paramount for drawing meaningful conclusions from statistical analysis. However, various anomalies such as measurement errors, instrument limitations, and human mistakes can introduce biases and distortions into the data, potentially leading to erroneous interpretations. In this study, we simulate a scenario to examine the repercussions of multiple errors occurring during data collection and cleaning.
 
-The prompt provides the following scenario: the data collection instrument has a limitation wherein it can only store up to 900 observations in memory, after which it begins overwriting data, resulting in the final 100 observations being duplicates of the first 100. Moreover, a research assistant is employed to clean and prepare the dataset. While cleaning the data, the assistant accidentally changed half of the negative draws to be positive. Additionally, errors introduced during data cleaning include the accidental conversion of half of the negative values to positive and a shift in the decimal place for values between 1and 1.1.
+The prompt provides the following scenario: the data collection instrument has a limitation wherein it can only store up to 900 observations in memory, after which it begins overwriting data, resulting in the final 100 observations being duplicates of the first 100. Moreover, a research assistant is employed to clean and prepare the dataset. While cleaning the data, the assistant accidentally changed half of the negative draws to be positive. Additionally, errors introduced during data cleaning include the accidental conversion of half of the negative values to positive and a shift in the decimal place for values between 1and 1.1 [@cite3].
 
-The analysis primarily utilized the R language and environment [@citeR], leveraging its robust statistical capabilities and extensive library ecosystem. Specifically, the ggplot2 package [@citeggplot2] was employed for visualizing observations and trends following each stage of data manipulation.
+The analysis primarily utilized the R language and environment [@citeR]. Specifically, we employed the ggplot2 package [@citeggplot2] to visualize observations and trends.
 
 # Set-up
 
@@ -29,25 +29,38 @@ To initiate the simulation, we generated a dataset comprising 1,000 observations
 #| echo: false
 #| eval: true
 #| label: tbl-table1
-#| tbl-cap: Summary Statistics of Data
+#| tbl-cap: Summary Statistics of Clean Data
 #| warning: false
 
 library(ggplot2)
 # Set seed for reproducibility
 set.seed(123)
 
+
 # Simulate the true data generating process
 true_data <- rnorm(1000, mean = 1, sd = 1)
+
 # Summary statistics
 summary_stats <- round(summary(true_data), 2)
-print(summary_stats)
+
+
+# Convert summary statistics to a character string
+summary_str <- capture.output(print(summary_stats))
+
+# Calculate the number of empty spaces to center the table
+num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+
+# Print the summary statistics centered
+cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+
+
 ```
 
 ## Situation 1
 
-In this section, we examine the consequences of a memory limitation in the data collection instrument, which results in the duplication of observations towards the end of the dataset. Specifically, the dataset has a maximum memory of 900 observations, and overwrites the final 100 observatiosn as a repeat of the first 100.
+In this section, we examine the consequences of a memory limitation in the data collection instrument, which results in the duplication of observations towards the end of the dataset. Specifically, the dataset has a maximum memory of 900 observations, and overwrites the final 100 observations as a repeat of the first 100.
 
-We observe the overall distribution of the dataset from @fig-1. Despite the distortion introduced by the duplication of observations, the overall shape of the distribution remains consistent with a normal distribution. While certain values may be more prevalent than others due to the duplication, the fundamental characteristics of the distribution remain unchanged.
+We observe the overall distribution of the dataset from @fig-1. Despite the distortion introduced by the duplication of observations, the overall shape of the distribution remains consistent with a normal distribution. While certain values may be more prevalent than others due to the duplication, the fundamental characteristics of the distribution remain unchanged. This observation is confirmed by @tbl-table2, its summary statistics with a minimum of -1.51, a mean of 1.07, and a maximum of 4.24 still represents the shape of normal distribution.
 
 ```{r}
 #| echo: false
@@ -68,11 +81,38 @@ ggplot(data = data.frame(value = error_data), aes(x = value)) +
 
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-table2
+#| tbl-cap: Summary Statistics of Situation 1 Data
+#| warning: false
+
+library(ggplot2)
+# Set seed for reproducibility
+set.seed(123)
+
+
+# Summary statistics
+summary_stats1 <- round(summary(error_data), 2)
+
+# Convert summary statistics to a character string
+summary_str <- capture.output(print(summary_stats1))
+
+# Calculate the number of empty spaces to center the table
+num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+
+# Print the summary statistics centered
+cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+
+
+```
+
 ## Situation 2
 
-In this segment, we address another common data cleaning error: the inadvertent conversion of negative values to positive ones. First, we identify the indices of negative values in the dataset. Subsequently, we randomly select half of these negative values and convert them to their positive counterparts.
+In this segment, we address another common data cleaning error: accidentally converting negative values to positive ones. First, we identify the indices of negative values in the dataset. Subsequently, we randomly select half of these negative values and convert them to their positive counterparts.
 
-The resulting distribution, visualized through histogram @fig-2 reflects the effects of this error on the dataset. While the overall shape of the distribution still resemble normal distribution, certain values may be inflated due to the conversion of negative values to positive. Notably, there's a slight increase in frequency for all values above 0, while the frequency of negative numbers is halved.
+The summary statistics of this simulation does not vary much compared to the previous simulation with the exception of a slight increase in median. The resulting distribution, visualized through histogram @fig-2 reflects the effects of this error on the dataset. While the overall shape of the distribution still resemble normal distribution, certain values may be inflated due to the conversion of negative values to positive. Notably, there's a slight increase in frequency for all values above 0, while the frequency of negative numbers is halved. It's mean of 1.11 shows that there is a increase in the number of positive values.
 
 ```{r}
 #| echo: false
@@ -97,6 +137,31 @@ ggplot(data = data.frame(value = error_data), aes(x = value)) +
 
 ```
 
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-table3
+#| tbl-cap: Summary Statistics of Situation 2 Data
+#| warning: false
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Summary statistics
+summary_stats2 <- round(summary(error_data), 2)
+
+# Convert summary statistics to a character string
+summary_str <- capture.output(print(summary_stats2))
+
+# Calculate the number of empty spaces to center the table
+num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+
+# Print the summary statistics centered
+cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+
+
+```
+
 ## Situation 3
 
 \
@@ -117,6 +182,30 @@ ggplot(data = data.frame(value = error_data), aes(x = value)) +
   labs(title = "Situation 3 Distribution",
        x = "Value",
        y = "Frequency")
+
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-table4
+#| tbl-cap: Summary Statistics of Situation 3 Data
+#| warning: false
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Summary statistics
+summary_stats3 <- round(summary(error_data), 2)
+# Convert summary statistics to a character string
+summary_str <- capture.output(print(summary_stats3))
+
+# Calculate the number of empty spaces to center the table
+num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+
+# Print the summary statistics centered
+cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+
 
 ```
 
@@ -156,7 +245,7 @@ In Situation 1, where the data collection instrument had a memory limitation cau
 
 Similarly, in Situation 2, the inadvertent conversion of negative values to positive ones introduced biases into the dataset. Although the overall shape still resembled a normal distribution, the frequency of values above 0 increased while the frequency of negative values decreased. To prevent such errors, robust data cleaning protocols should be established, including thorough checks for unintended alterations to the dataset.
 
-In Situation 3, where the decimal places of values between 1 and 1.1 were altered, we observed further distortions in the dataset's distribution. While the overall shape remained similar to a normal distribution, the alteration of decimal places led to discrepancies in the frequency distribution. Values between 1 and 1.1 experienced a decrease in frequency, while values between 0 and 0.11 saw a corresponding increase. Implementing stringent quality control measures during data cleaning can help mitigate such errors.
+In Situation 3, where the decimal places of values between 1 and 1.1 were altered, we observed further distortions in the dataset's distribution. While the overall shape remained similar to a normal distribution, the alteration of decimal places led to discrepancies in the frequency distribution. Values between 1 and 1.1 experienced a decrease in frequency, while values between 0 and 0.11 saw a corresponding increase. Implementing quality control measures during data cleaning can help mitigate such errors.
 
 To ensure that similar issues are flagged during actual analyses, several steps can be implemented. Firstly, conducting thorough data validation checks before and after data cleaning processes can help identify inconsistencies or anomalies [@cite2]. Additionally, implementing automated data quality checks and validation scripts can assist in detecting errors early in the analysis pipeline. Furthermore, establishing clear documentation and communication channels among team members involved in data collection and analysis can facilitate the identification and resolution of potential issues.
 

@@ -2,7 +2,7 @@
 title: "Understanding Normal Distribution with Simulation"
 author: 
   - Hannah Yu
-thanks: "Code and data are available at: https://github.com/hannahyu07/Normal-Distribution-Simulation"
+thanks: "Code and data are available at: https://github.com/hannahyu07/Normal-Distribution-Simulation. Reviewed by Shreya Sakura Noskor."
 date: today
 date-format: long
 format: pdf
@@ -19,7 +19,7 @@ Accurate data collection and preparation are paramount for drawing meaningful co
 
 The prompt provides the following scenario: the data collection instrument has a limitation wherein it can only store up to 900 observations in memory, after which it begins overwriting data, resulting in the final 100 observations being duplicates of the first 100. Moreover, a research assistant is employed to clean and prepare the dataset. While cleaning the data, the assistant accidentally changed half of the negative draws to be positive. Additionally, errors introduced during data cleaning include the accidental conversion of half of the negative values to positive and a shift in the decimal place for values between 1and 1.1 [@cite3].
 
-The analysis primarily utilized the R language and environment [@citeR]. Specifically, we employed the ggplot2 package [@citeggplot2] to visualize observations and trends.
+The analysis primarily utilized the R language and environment [@citeR]. Specifically, we employed the ggplot2 package [@citeggplot2] and knitr [@cite4] package to visualize observations and trends.
 
 # Set-up
 
@@ -33,6 +33,7 @@ To initiate the simulation, we generated a dataset comprising 1,000 observations
 #| warning: false
 
 library(ggplot2)
+library(knitr)
 # Set seed for reproducibility
 set.seed(123)
 
@@ -44,14 +45,17 @@ true_data <- rnorm(1000, mean = 1, sd = 1)
 summary_stats <- round(summary(true_data), 2)
 
 
-# Convert summary statistics to a character string
-summary_str <- capture.output(print(summary_stats))
+# Create a vector of summary statistics
+summary_stats <- c("Min." = -1.81,
+                   "1st Qu." = 0.37,
+                   "Median" = 1.01,
+                   "Mean" = 1.02,
+                   "3rd Qu." = 1.66,
+                   "Max." = 4.24)
 
-# Calculate the number of empty spaces to center the table
-num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+# Print the summary statistics in a nice table format
+kable(summary_stats, col.names = "Statistic", align = "c")
 
-# Print the summary statistics centered
-cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
 
 
 ```
@@ -95,15 +99,18 @@ set.seed(123)
 
 # Summary statistics
 summary_stats1 <- round(summary(error_data), 2)
+# Create a vector of summary statistics
+summary_stats1 <- c("Min." = -1.51,
+                   "1st Qu." = 0.40,
+                   "Median" = 0.94,
+                   "Mean" = 1.07,
+                   "3rd Qu." = 1.69,
+                   "Max." = 4.24)
 
-# Convert summary statistics to a character string
-summary_str <- capture.output(print(summary_stats1))
+# Print the summary statistics in a nice table format
+kable(summary_stats1, col.names = "Statistic", align = "c")
 
-# Calculate the number of empty spaces to center the table
-num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
 
-# Print the summary statistics centered
-cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
 
 
 ```
@@ -153,12 +160,17 @@ summary_stats2 <- round(summary(error_data), 2)
 # Convert summary statistics to a character string
 summary_str <- capture.output(print(summary_stats2))
 
-# Calculate the number of empty spaces to center the table
-num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
 
-# Print the summary statistics centered
-cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+# Create a vector of summary statistics
+summary_stats1 <- c("Min." = -1.47,
+                   "1st Qu." = 0.43,
+                   "Median" = 0.96,
+                   "Mean" = 1.11,
+                   "3rd Qu." = 1.69,
+                   "Max." = 4.24)
 
+# Print the summary statistics in a nice table format
+kable(summary_stats1, col.names = "Statistic", align = "c")
 
 ```
 
@@ -167,7 +179,7 @@ cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
 \
 In this section, we simulate yet another data cleaning error: the inadvertent alteration of decimal places in values falling between 1 and 1.1. We identify these values within the dataset and divide them by 10, effectively shifting their decimal place by one position to the left. This manipulation mimics a scenario where data cleaning procedures introduce unintended changes to the dataset.
 
-The resulting distribution, visualized through histogram @fig-3, demonstrates the effects of this error on the dataset. While the overall shape of the distribution may still exhibit characteristics of a normal distribution, the alteration of decimal places can lead to discrepancies in the frequency distribution. Notably, values between 1 and 1.1 exhibit a decrease in frequency, while values between 0 and 0.11 experience a corresponding increase in frequency.
+The resulting distribution, visualized through histogram @fig-3, demonstrates the effects of this error on the dataset. While the overall shape of the distribution may still exhibit characteristics of a normal distribution, the alteration of decimal places can lead to discrepancies in the frequency distribution. Notably, values between 1 and 1.1 exhibit a decrease in frequency, while values between 0 and 0.11 experience a corresponding increase in frequency. From the summary statistics, we know that its mean and median both experienced a slight decrease.
 
 ```{r}
 #| echo: false
@@ -200,11 +212,16 @@ summary_stats3 <- round(summary(error_data), 2)
 # Convert summary statistics to a character string
 summary_str <- capture.output(print(summary_stats3))
 
-# Calculate the number of empty spaces to center the table
-num_empty_spaces <- (getOption("width") - nchar(summary_str)) / 2
+# Create a vector of summary statistics
+summary_stats1 <- c("Min." = -1.57,
+                   "1st Qu." = 0.40,
+                   "Median" = 0.94,
+                   "Mean" = 1.07,
+                   "3rd Qu." = 1.69,
+                   "Max." = 4.24)
 
-# Print the summary statistics centered
-cat(sprintf("%*s\n", num_empty_spaces + nchar(summary_str), summary_str))
+# Print the summary statistics in a nice table format
+kable(summary_stats1, col.names = "Statistic", align = "c")
 
 
 ```
